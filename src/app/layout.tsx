@@ -10,7 +10,9 @@ const geistMono = GeistMono;
 export const metadata: Metadata = {
   title: 'ImagiCraft AI',
   description: 'Craft stunning visuals from your imagination with AI.',
-  icons: null, // Explicitly disable favicon generation/serving by Next.js
+  icons: {
+    icon: '/sparkle-icon.png', // Reference the icon placed in the public folder
+  },
 };
 
 export default function RootLayout({
