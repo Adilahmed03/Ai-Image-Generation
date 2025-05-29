@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -19,7 +20,7 @@ const nextConfig: NextConfig = {
     ],
   },
   devIndicators: {
-    buildActivity: false, // Disables the build activity indicator
+    // buildActivity: false, // This line is removed as it's deprecated
   },
 };
 
