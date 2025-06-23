@@ -15,12 +15,12 @@ export default function HomePage() {
             </span>
             <span className="text-primary"> AI</span>
           </h1>
-          <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto">
+          <p className="mt-4 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Unleash your creativity. Describe your vision, and let our AI craft stunning visuals for you.
           </p>
         </header>
 
-        <div className="w-full max-w-xl mt-8 sm:mt-10">
+        <div className="w-full max-w-4xl mt-8 sm:mt-10">
           <ImageGeneratorForm />
         </div>
       </main>
