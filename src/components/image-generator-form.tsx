@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import NextImage from "next/image"; // Aliased to avoid conflict
-import { Wand2, Loader2, AlertTriangle, Image as ImageIconLucide, Sparkles } from "lucide-react";
+import { Wand2, Loader2, AlertTriangle, Image as ImageIconLucide, Sparkles, Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -65,6 +65,16 @@ export function ImageGeneratorForm() {
       setIsLoading(false);
     }
   }
+
+  // Function to handle image download
+  const handleDownload = (url: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <Card className="w-full shadow-2xl bg-card/80 backdrop-blur-sm border-border/50">
@@ -140,7 +150,7 @@ export function ImageGeneratorForm() {
             {imageUrls && !isLoading && !error && (
               <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-4 animate-fadeIn">
                 {(Object.keys(imageUrls) as Array<keyof typeof imageUrls>).map((style) => (
-                    <div key={style} className="flex flex-col items-center gap-2">
+                    <div key={style} className="flex flex-col items-center gap-3">
                         <h3 className="text-lg font-semibold capitalize text-primary">{style}</h3>
                         <div className="w-full aspect-square bg-muted/30 rounded-lg shadow-md overflow-hidden border border-border/30 relative">
                             <NextImage
@@ -153,6 +163,15 @@ export function ImageGeneratorForm() {
                                 unoptimized={imageUrls[style].startsWith('data:')}
                             />
                         </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownload(imageUrls[style], `imagicraft-${style}.png`)}
+                            className="w-full"
+                        >
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                        </Button>
                     </div>
                 ))}
               </div>
@@ -169,3 +188,4 @@ export function ImageGeneratorForm() {
     </Card>
   );
 }
+
