@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
   prompt: z.string()
     .min(10, "Please enter a more descriptive prompt (at least 10 characters).")
-    .max(1000, "Prompt is too long (maximum 1000 characters)."),
+    .max(2000, "Prompt is too long (maximum 2000 characters)."),
 });
 
 type ImageStyles = {

@@ -7,8 +7,8 @@ export async function handleGenerateImages(input: GenerateImagesInput): Promise<
   if (!input.prompt || typeof input.prompt !== 'string' || input.prompt.trim().length === 0) {
     throw new Error("Prompt cannot be empty.");
   }
-  if (input.prompt.length > 1000) { // Max length check
-      throw new Error("Prompt is too long. Maximum 1000 characters.");
+  if (input.prompt.length > 2000) { // Max length check
+      throw new Error("Prompt is too long. Maximum 2000 characters.");
   }
 
   try {
