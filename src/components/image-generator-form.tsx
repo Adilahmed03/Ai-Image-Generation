@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { handleGenerateImage } from "@/app/actions";
+import { handleGenerateImages } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
@@ -21,8 +21,14 @@ const formSchema = z.object({
     .max(1000, "Prompt is too long (maximum 1000 characters)."),
 });
 
+type ImageStyles = {
+    animated: string;
+    pixar: string;
+    cinematic: string;
+}
+
 export function ImageGeneratorForm() {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState<ImageStyles | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -37,18 +43,18 @@ export function ImageGeneratorForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
-    setImageUrl(null);
+    setImageUrls(null);
 
     try {
-      const result = await handleGenerateImage({ prompt: values.prompt });
-      setImageUrl(result.imageUrl);
+      const result = await handleGenerateImages({ prompt: values.prompt });
+      setImageUrls(result);
       toast({
-        title: "Image Generated!",
-        description: "Your masterpiece is ready.",
+        title: "Images Generated!",
+        description: "Your masterpieces are ready.",
         variant: "default",
       });
     } catch (e: any) {
-      const errorMessage = e.message || "An unexpected error occurred while generating the image.";
+      const errorMessage = e.message || "An unexpected error occurred while generating the images.";
       setError(errorMessage);
       toast({
         title: "Generation Failed",
@@ -67,7 +73,7 @@ export function ImageGeneratorForm() {
             <Sparkles className="h-8 w-8 text-accent" />
         </div>
         <CardTitle className="text-2xl font-semibold tracking-tight">Describe Your Vision</CardTitle>
-        <CardDescription>Enter a detailed prompt to generate a unique image.</CardDescription>
+        <CardDescription>Enter a detailed prompt to generate a unique image in three styles.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -107,7 +113,7 @@ export function ImageGeneratorForm() {
               ) : (
                 <>
                   <Wand2 className="mr-2 h-6 w-6 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300" />
-                  Craft Image
+                  Craft Images
                 </>
               )}
             </Button>
@@ -115,13 +121,12 @@ export function ImageGeneratorForm() {
         </Form>
       </CardContent>
       
-      {(isLoading || imageUrl || error) && (
-        <CardFooter className="mt-6">
-          <div className="w-full aspect-video bg-muted/30 rounded-lg shadow-md flex items-center justify-center overflow-hidden border border-border/30 relative transition-all duration-500 ease-in-out">
+      <CardFooter className="mt-6">
+          <div className="w-full bg-muted/30 rounded-lg shadow-md flex items-center justify-center overflow-hidden border border-border/30 relative transition-all duration-500 ease-in-out p-4 min-h-[250px] sm:min-h-[300px]">
             {isLoading && (
               <div className="flex flex-col items-center justify-center text-primary p-4 animate-fadeIn">
                 <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 animate-spin" />
-                <p className="mt-4 text-md sm:text-lg font-medium">Generating your masterpiece...</p>
+                <p className="mt-4 text-md sm:text-lg font-medium">Generating your masterpieces...</p>
                 <p className="text-xs sm:text-sm text-muted-foreground">This might take a moment.</p>
               </div>
             )}
@@ -132,40 +137,35 @@ export function ImageGeneratorForm() {
                 <p className="text-xs sm:text-sm mt-1">{error}</p>
               </div>
             )}
-            {imageUrl && !isLoading && !error && (
-              <NextImage
-                src={imageUrl}
-                alt="Generated AI Image"
-                layout="fill"
-                objectFit="contain" // or "cover" depending on desired behavior
-                className="animate-fadeIn"
-                priority={true}
-                unoptimized={imageUrl.startsWith('data:')} // Handle potential base64 images from Genkit (though typically URLs)
-              />
+            {imageUrls && !isLoading && !error && (
+              <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-4 animate-fadeIn">
+                {(Object.keys(imageUrls) as Array<keyof typeof imageUrls>).map((style) => (
+                    <div key={style} className="flex flex-col items-center gap-2">
+                        <h3 className="text-lg font-semibold capitalize text-primary">{style}</h3>
+                        <div className="w-full aspect-square bg-muted/30 rounded-lg shadow-md overflow-hidden border border-border/30 relative">
+                            <NextImage
+                                src={imageUrls[style]}
+                                alt={`Generated AI Image in ${style} style`}
+                                layout="fill"
+                                objectFit="contain"
+                                className="animate-fadeIn"
+                                priority={true}
+                                unoptimized={imageUrls[style].startsWith('data:')}
+                            />
+                        </div>
+                    </div>
+                ))}
+              </div>
             )}
-            {!isLoading && !imageUrl && !error && (
+            {!isLoading && !imageUrls && !error && (
                  <div className="p-4 text-center text-muted-foreground animate-fadeIn">
                     <ImageIconLucide className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-30" />
-                    <p className="text-md sm:text-lg font-medium">Your AI-generated image will appear here.</p>
-                    <p className="text-xs sm:text-sm mt-1">Enter a prompt above and click "Craft Image".</p>
+                    <p className="text-md sm:text-lg font-medium">Your AI-generated images will appear here.</p>
+                    <p className="text-xs sm:text-sm mt-1">Enter a prompt above and click "Craft Images".</p>
                 </div>
             )}
           </div>
         </CardFooter>
-      )}
-       {!isLoading && !imageUrl && !error && (
-         <CardFooter className="mt-6">
-            <div className="w-full aspect-video bg-muted/30 rounded-lg shadow-md flex items-center justify-center overflow-hidden border border-border/30 relative">
-                <div className="p-4 text-center text-muted-foreground animate-fadeIn">
-                    <ImageIconLucide className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-30" />
-                    <p className="text-md sm:text-lg font-medium">Your AI-generated image will appear here.</p>
-                    <p className="text-xs sm:text-sm mt-1">Enter a prompt above and click "Craft Image".</p>
-                </div>
-            </div>
-        </CardFooter>
-        )}
     </Card>
   );
 }
-
-    
